@@ -1,0 +1,74 @@
+package com.fyb.plasma.entity;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
+import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+/**
+ * <p>
+ * Plasma记录
+ * </p>
+ *
+ * @author fyb
+ * @since 2020-09-09
+ */
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@TableName("plasma_rec")
+public class Rec implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "r_id", type = IdType.AUTO)
+    private Long rId;
+
+    private LocalDateTime inTime;
+
+    /**
+     * 机器号
+     */
+    private String mc;
+
+    /**
+     * 芯片型号
+     */
+    private String tt;
+
+    /**
+     * WaferSource
+     */
+    private String ws;
+
+    /**
+     * WaferLot+片号
+     */
+    private String wl;
+
+    /**
+     * 工号
+     */
+    private String bn;
+
+    /**
+     * 班次  A0 =A夜
+     */
+    private String sf;
+
+    /**
+     * 本条记录是第几次Plasma
+     */
+    private Integer plasmaCount;
+
+    /**
+     * 是否超次数
+     */
+    private Boolean isOverCount;
+
+
+}
