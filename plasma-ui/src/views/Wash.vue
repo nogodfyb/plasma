@@ -3,8 +3,10 @@
       <van-nav-bar
         title="清洗"
         left-text="回到首页"
+        right-text="切换删除模式"
         left-arrow
         @click-left="onClickLeft"
+        @click-right="onClickRight"
       />
       <van-form @submit="onSubmit" :submit-on-enter="false">
         <van-field
@@ -39,7 +41,12 @@
         finished-text="没有更多了"
       >
         <van-cell v-for="item in waferList" :key="item.ws"  >
-          <van-row style="text-align: left">
+          <van-row style="text-align: left;color: red" v-if="item.isOverCount===true">
+            <van-col span="8">{{item.device}}</van-col>
+            <van-col span="8">{{item.waferSource}}</van-col>
+            <van-col span="8">{{item.waferLot}}</van-col>
+          </van-row>
+          <van-row style="text-align: left" v-if="item.isOverCount!==true">
             <van-col span="8">{{item.device}}</van-col>
             <van-col span="8">{{item.waferSource}}</van-col>
             <van-col span="8">{{item.waferLot}}</van-col>
@@ -75,7 +82,8 @@ export default {
       password: '',
       startTime: undefined,
       endTime: undefined,
-      needConfirmAuth: false
+      needConfirmAuth: false,
+      deleteMode: false
     }
   },
   watch: {
@@ -88,6 +96,18 @@ export default {
   methods: {
     onClickLeft () {
       this.$router.push('/')
+    },
+    onClickRight () {
+      if (this.deleteMode) {
+        this.deleteMode = false
+        this.$toast.success('已关闭删除模式!请照常使用!')
+      } else {
+        this.deleteMode = true
+        if (this.waferList.length === 0) {
+          return this.$toast.fail('当前列表无任何内容!不能开启删除模式!')
+        }
+        this.$toast.success('已开启删除模式!再次扫描之前扫描过的芯片即可从下方列表删除!')
+      }
     },
     onToastClose () {
       this.$refs.field.focus()
@@ -112,12 +132,12 @@ export default {
       if (this.currentWaferSource === '') {
         return this.$toast.fail('未键入任何内容')
       }
-      this.endTime = new Date()
-      const timeDiff = this.endTime - this.startTime
-      if (timeDiff > 50) {
-        this.currentWaferSource = ''
-        return this.$toast.fail('不允许手输:' + timeDiff + 'ms')
-      }
+      // this.endTime = new Date()
+      // const timeDiff = this.endTime - this.startTime
+      // if (timeDiff > 50) {
+      //   this.currentWaferSource = ''
+      //   return this.$toast.fail('不允许手输:' + timeDiff + 'ms')
+      // }
       const array = this.currentWaferSource.split('^')
       const device = array[0]
       const waferSource = array[1]
@@ -126,6 +146,15 @@ export default {
         device,
         waferSource,
         waferLot
+      }
+      if (this.deleteMode && this.waferList.length >= 1) {
+        for (let i = 0; i < this.waferList.length; i++) {
+          if (waferLot === this.waferList[i].waferLot) {
+            this.waferList.splice(i, 1)
+            this.deleteMode = false
+            return this.$toast.success('已成功删除:' + waferLot)
+          }
+        }
       }
       // 当前扫描数已达8个
       if (this.waferList.length === 8) {
@@ -153,6 +182,7 @@ export default {
           return this.$toast.fail('当前扫描芯片已达上限!已经扫描次数:' + countRes.data + ' 而你没有权限操作!')
         }
         // 有权限标注本次操作需要权限，然后不做多余操作，往下继续执行
+        wafer.isOverCount = true
         this.needConfirmAuth = true
       }
       const res = await this.$http.get(`recipe/${waferSource}`)
