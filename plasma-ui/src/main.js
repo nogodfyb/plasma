@@ -5,7 +5,7 @@ import store from './store'
 import './plugins/vant'
 import axios from 'axios'
 axios.defaults.baseURL = 'http://192.168.191.1:8084/plasma/'
-// axios.defaults.baseURL = '/plasma/'
+// axios.defaults.baseURL = 'http://192.168.191.1:8084/plasma/'
 // 允许携带cookie
 axios.defaults.withCredentials = true
 // 响应拦截器

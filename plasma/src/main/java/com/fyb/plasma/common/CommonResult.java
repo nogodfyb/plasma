@@ -36,6 +36,15 @@ public class CommonResult<T> {
     }
 
     /**
+     * 操作失败返回结果
+     *
+     *
+     */
+    public static <T> CommonResult<T> failed(T data) {
+        return new CommonResult<T>(ResultCodeEnum.FAILED.getCode(), ResultCodeEnum.FAILED.getMessage(), data);
+    }
+
+    /**
      * 参数校验失败返回结果
      *
      *

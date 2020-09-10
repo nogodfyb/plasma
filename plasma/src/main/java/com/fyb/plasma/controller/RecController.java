@@ -45,6 +45,7 @@ public class RecController {
             rec.setTt(waferPlasma.getDevice());
             rec.setWs(waferPlasma.getWaferSource());
             rec.setWl(waferPlasma.getWaferLot());
+            rec.setRecipeName(waferPlasma.getRecipeName());
             rec.setPlasmaCount(count);
             rec.setIsOverCount(count>Const.OVER_TIMES);
             rec.setSf(ShiftUtils.getShiftByNow());
@@ -55,11 +56,11 @@ public class RecController {
 
     //判断当前waferLot是否超次清洗
     @GetMapping("/isOverCount")
-    public CommonResult<Boolean> isOverCount(String waferLot){
+    public CommonResult<Integer> isOverCount(String waferLot){
         QueryWrapper<Rec> recQueryWrapper = new QueryWrapper<>();
         recQueryWrapper.eq("wl",waferLot);
         int count = recService.count(recQueryWrapper);
-        return CommonResult.success(count>=Const.OVER_TIMES);
+        return count>=Const.OVER_TIMES?CommonResult.success(count):CommonResult.failed(count);
     }
 
 }

@@ -1,4 +1,4 @@
 module.exports = {
-  productionSourceMap: false
-  // publicPath: './'
+  productionSourceMap: false,
+  publicPath: './'
 }
