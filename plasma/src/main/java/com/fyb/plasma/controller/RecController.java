@@ -2,17 +2,23 @@ package com.fyb.plasma.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fyb.plasma.common.CommonPage;
 import com.fyb.plasma.common.CommonResult;
 import com.fyb.plasma.common.Const;
+import com.fyb.plasma.dto.RecordPageParam;
 import com.fyb.plasma.dto.WaferPlasma;
 import com.fyb.plasma.entity.DiesawUser;
 import com.fyb.plasma.entity.Rec;
 import com.fyb.plasma.service.IRecService;
 import com.fyb.plasma.util.ShiftUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -61,6 +67,33 @@ public class RecController {
         recQueryWrapper.eq("wl",waferLot);
         int count = recService.count(recQueryWrapper);
         return count>=Const.OVER_TIMES?CommonResult.success(count):CommonResult.failed(count);
+    }
+    //分页查询
+    @GetMapping("list")
+    public CommonResult<CommonPage<Rec>> list(@Valid RecordPageParam pageParam){
+        Page<Rec> recordPage = new Page<>();
+        recordPage.setSize(pageParam.getPageSize());
+        recordPage.setCurrent(pageParam.getPageNum());
+        QueryWrapper<Rec> queryWrapper = new QueryWrapper<>();
+        if(!StringUtils.isEmpty(pageParam.getWaferSource())){
+            queryWrapper.like("ws",pageParam.getWaferSource());
+        }
+        if(!StringUtils.isEmpty(pageParam.getRecipeName())){
+            queryWrapper.like("recipe_name",pageParam.getRecipeName());
+        }
+        if(!StringUtils.isEmpty(pageParam.getDevice())){
+            queryWrapper.like("tt",pageParam.getDevice());
+        }
+        if(!StringUtils.isEmpty(pageParam.getWaferLot())){
+            queryWrapper.like("wl",pageParam.getWaferLot());
+        }
+        if(!StringUtils.isEmpty(pageParam.getStartTime())){
+            queryWrapper.between("in_time",pageParam.getStartTime(),pageParam.getEndTime());
+        }
+        IPage<Rec> pageResult = recService.page(recordPage,queryWrapper);
+        CommonPage<Rec> commonPage = CommonPage.resetPage(pageResult);
+        CommonResult<CommonPage<Rec>> success = CommonResult.success(commonPage);
+        return success;
     }
 
 }

@@ -4,6 +4,7 @@ package com.fyb.plasma.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fyb.plasma.common.CommonResult;
 import com.fyb.plasma.common.Const;
+import com.fyb.plasma.dto.AdminParam;
 import com.fyb.plasma.entity.DiesawUser;
 import com.fyb.plasma.service.IDiesawUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,29 @@ public class DiesawUserController {
         DiesawUser one = userService.getOne(userQueryWrapper);
         return one!=null?CommonResult.success(null):CommonResult.failed();
     }
+
+    //后台管理系统登录
+    @PostMapping("adminLogin")
+    public CommonResult<Object> adminLogin(@RequestBody AdminParam adminParam, HttpSession session){
+        boolean status1 = "admin".equals(adminParam.getUsername());
+        boolean status2 = "admin".equals(adminParam.getPassword());
+        if(status1&&status2){
+            // 登录成功存储在session中
+            session.setAttribute(Const.CURRENT_USER,adminParam);
+            return CommonResult.success(null);
+        }
+        return CommonResult.failed();
+    }
+
+    //检验用户是否已登录
+    @GetMapping("isLogin")
+    public CommonResult<Object> isLogin(HttpSession session){
+        Object user = session.getAttribute(Const.CURRENT_USER);
+        if (user==null) {
+            return  CommonResult.failed();
+        }else return CommonResult.success(null);
+    }
+
 
 
 }

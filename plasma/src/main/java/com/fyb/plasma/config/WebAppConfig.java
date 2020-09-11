@@ -15,7 +15,7 @@ public class WebAppConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 设置拦截的路径、不拦截的路径、优先级等等
         registry.addInterceptor(new SessionInterceptor()).addPathPatterns("/plasma/**")
-                .excludePathPatterns("/plasma/user/login");
+                .excludePathPatterns("/plasma/user/login","/plasma/user/adminLogin");
     }
 
 
