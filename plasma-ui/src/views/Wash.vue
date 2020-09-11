@@ -3,7 +3,7 @@
       <van-nav-bar
         title="清洗"
         left-text="回到首页"
-        right-text="切换删除模式"
+        :right-text="modeName"
         left-arrow
         @click-left="onClickLeft"
         @click-right="onClickRight"
@@ -86,6 +86,11 @@ export default {
       deleteMode: false
     }
   },
+  computed: {
+    modeName () {
+      return this.deleteMode ? '删除模式' : '正常模式'
+    }
+  },
   watch: {
     currentWaferSource () {
       if (this.currentWaferSource.length === 1) {
@@ -102,10 +107,10 @@ export default {
         this.deleteMode = false
         this.$toast.success('已关闭删除模式!请照常使用!')
       } else {
-        this.deleteMode = true
         if (this.waferList.length === 0) {
           return this.$toast.fail('当前列表无任何内容!不能开启删除模式!')
         }
+        this.deleteMode = true
         this.$toast.success('已开启删除模式!再次扫描之前扫描过的芯片即可从下方列表删除!')
       }
     },
@@ -132,12 +137,12 @@ export default {
       if (this.currentWaferSource === '') {
         return this.$toast.fail('未键入任何内容')
       }
-      // this.endTime = new Date()
-      // const timeDiff = this.endTime - this.startTime
-      // if (timeDiff > 50) {
-      //   this.currentWaferSource = ''
-      //   return this.$toast.fail('不允许手输:' + timeDiff + 'ms')
-      // }
+      this.endTime = new Date()
+      const timeDiff = this.endTime - this.startTime
+      if (timeDiff > 50) {
+        this.currentWaferSource = ''
+        return this.$toast.fail('不允许手输:' + timeDiff + 'ms')
+      }
       const array = this.currentWaferSource.split('^')
       const device = array[0]
       const waferSource = array[1]
