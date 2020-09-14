@@ -67,10 +67,19 @@ public class DiesawUserController {
         boolean status2 = "admin".equals(adminParam.getPassword());
         if(status1&&status2){
             // 登录成功存储在session中
-            session.setAttribute(Const.CURRENT_USER,adminParam);
+            DiesawUser diesawUser = new DiesawUser();
+            diesawUser.setBn(adminParam.getUsername());
+            session.setAttribute(Const.CURRENT_USER,diesawUser);
             return CommonResult.success(null);
+        }else {
+            QueryWrapper<DiesawUser> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.eq("bn","G3393").eq("pw",adminParam.getPassword());
+            DiesawUser one = userService.getOne(userQueryWrapper);
+            if(one!=null){
+                session.setAttribute(Const.CURRENT_USER,one);
+            }
+            return one!= null?CommonResult.success(null):CommonResult.failed();
         }
-        return CommonResult.failed();
     }
 
     //检验用户是否已登录

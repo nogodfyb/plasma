@@ -106,12 +106,15 @@ export default {
       if (this.deleteMode) {
         this.deleteMode = false
         this.$toast.success('已关闭删除模式!请照常使用!')
+        this.onToastClose()
       } else {
         if (this.waferList.length === 0) {
+          this.onToastClose()
           return this.$toast.fail('当前列表无任何内容!不能开启删除模式!')
         }
         this.deleteMode = true
         this.$toast.success('已开启删除模式!再次扫描之前扫描过的芯片即可从下方列表删除!')
+        this.onToastClose()
       }
     },
     onToastClose () {
@@ -157,6 +160,7 @@ export default {
           if (waferLot === this.waferList[i].waferLot) {
             this.waferList.splice(i, 1)
             this.deleteMode = false
+            this.currentWaferSource = ''
             return this.$toast.success('已成功删除:' + waferLot)
           }
         }

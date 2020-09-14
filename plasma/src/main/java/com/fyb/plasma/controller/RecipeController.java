@@ -9,6 +9,7 @@ import com.fyb.plasma.common.CommonPage;
 import com.fyb.plasma.common.CommonResult;
 import com.fyb.plasma.common.Const;
 import com.fyb.plasma.dto.RecipePageParam;
+import com.fyb.plasma.entity.DiesawUser;
 import com.fyb.plasma.entity.Recipe;
 import com.fyb.plasma.listener.UploadRecipeListener;
 import com.fyb.plasma.service.IRecipeService;
@@ -44,6 +45,15 @@ public class RecipeController {
     private IRecipeService recipeService;
 
 
+    //是否有增删改权限
+    private Boolean isAuth(HttpSession session){
+        DiesawUser user =(DiesawUser) session.getAttribute(Const.CURRENT_USER);
+        if("G3393".equals(user.getBn())){
+                return true;
+        }else return false;
+    }
+
+
     //根据waferSource查询对应关系
     @GetMapping("{ws}")
     public CommonResult<Recipe> selectRecipeByWs(@PathVariable String ws){
@@ -52,19 +62,28 @@ public class RecipeController {
     }
     //添加
     @PostMapping("add")
-    public CommonResult<Object> addRecipe(@RequestBody Recipe recipe){
+    public CommonResult<Object> addRecipe(@RequestBody Recipe recipe,HttpSession session){
+        if(!isAuth(session)){
+            return CommonResult.forbidden();
+        }
         boolean save = recipeService.save(recipe);
         return save?CommonResult.success(null): CommonResult.failed();
     }
     //更新
     @PutMapping("update")
-    public CommonResult<Object> updateRecipeByWs(@RequestBody Recipe recipe){
+    public CommonResult<Object> updateRecipeByWs(@RequestBody Recipe recipe,HttpSession session){
+        if(!isAuth(session)){
+            return CommonResult.forbidden();
+        }
         boolean update = recipeService.updateById(recipe);
         return update?CommonResult.success(null):CommonResult.failed();
     }
     //删除
     @DeleteMapping("{ws}")
-    public CommonResult<Object> deleteRecipeByWs(@PathVariable String ws){
+    public CommonResult<Object> deleteRecipeByWs(@PathVariable String ws,HttpSession session){
+        if(!isAuth(session)){
+            return CommonResult.forbidden();
+        }
         boolean remove = recipeService.removeById(ws);
         return remove?CommonResult.success(null):CommonResult.failed();
     }
@@ -111,7 +130,10 @@ public class RecipeController {
      */
     @PostMapping("upload")
     @ResponseBody
-    public String upload(MultipartFile file) throws IOException {
+    public String upload(MultipartFile file,HttpSession session) throws IOException {
+        if(!isAuth(session)){
+            return "没有权限";
+        }
         EasyExcel.read(file.getInputStream(), RecipeExcelVo.class, new UploadRecipeListener(recipeService)).sheet().doRead();
         return "success";
     }
