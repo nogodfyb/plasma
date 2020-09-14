@@ -78,8 +78,8 @@ public class UploadRecipeListener extends AnalysisEventListener<RecipeExcelVo> {
         LOGGER.info("{}条数据，开始存储数据库！", list.size());
         for (RecipeExcelVo recipeExcelVo : list) {
             Recipe recipe = new Recipe();
-            recipe.setWs(recipeExcelVo.getWaferSource());
-            recipe.setRecipeName(recipeExcelVo.getRecipe());
+            recipe.setWs(recipeExcelVo.getWaferSource().toUpperCase());
+            recipe.setRecipeName(recipeExcelVo.getRecipe().toUpperCase());
             recipe.setInTime(LocalDateTime.now());
             recipeService.saveOrUpdate(recipe);
         }

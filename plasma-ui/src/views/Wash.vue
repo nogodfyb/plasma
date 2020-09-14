@@ -3,7 +3,7 @@
       <van-nav-bar
         title="清洗"
         left-text="回到首页"
-        :right-text="modeName"
+        right-text="删除"
         left-arrow
         @click-left="onClickLeft"
         @click-right="onClickRight"
@@ -62,6 +62,15 @@
           placeholder="密码"  autocomplete="off"
         />
       </van-dialog>
+      <!-- 删除列表内中已填充的wafer  -->
+      <van-dialog v-model="deleteDialogShow" title="请扫描需要删除的wafer" show-cancel-button @confirm="onDeleteDialogConfirm" @close="onDeleteDialogClose">
+        <van-field
+          v-model="currentWaferSource"
+          name="wafer" ref="deleteRef"
+          label="wafer" @keyup.enter="onEnter"
+          placeholder=wafer  autocomplete="off"
+        />
+      </van-dialog>
     </div>
 </template>
 
@@ -79,16 +88,12 @@ export default {
       loading: true,
       finished: true,
       show: false,
+      deleteDialogShow: false,
       password: '',
       startTime: undefined,
       endTime: undefined,
       needConfirmAuth: false,
       deleteMode: false
-    }
-  },
-  computed: {
-    modeName () {
-      return this.deleteMode ? '删除模式' : '正常模式'
     }
   },
   watch: {
@@ -103,19 +108,12 @@ export default {
       this.$router.push('/')
     },
     onClickRight () {
-      if (this.deleteMode) {
-        this.deleteMode = false
-        this.$toast.success('已关闭删除模式!请照常使用!')
-        this.onToastClose()
-      } else {
-        if (this.waferList.length === 0) {
-          this.onToastClose()
-          return this.$toast.fail('当前列表无任何内容!不能开启删除模式!')
-        }
-        this.deleteMode = true
-        this.$toast.success('已开启删除模式!再次扫描之前扫描过的芯片即可从下方列表删除!')
-        this.onToastClose()
+      if (this.waferList.length === 0) {
+        return this.$toast.fail('当前列表没有任何内容,无法删除!')
       }
+      this.deleteDialogShow = true
+      this.deleteMode = true
+      setTimeout(() => { this.$refs.deleteRef.focus() }, 100)
     },
     onToastClose () {
       this.$refs.field.focus()
@@ -161,7 +159,12 @@ export default {
             this.waferList.splice(i, 1)
             this.deleteMode = false
             this.currentWaferSource = ''
+            this.deleteDialogShow = false
+            this.deleteMode = false
             return this.$toast.success('已成功删除:' + waferLot)
+          } else if (i === this.waferList.length - 1) {
+            this.currentWaferSource = ''
+            return this.$toast.fail('这片wafer不存在!')
           }
         }
       }
@@ -231,6 +234,14 @@ export default {
         this.$toast.fail('密码输入错误')
         this.show = true
       }
+    },
+    onDeleteDialogConfirm () {
+
+    },
+    onDeleteDialogClose () {
+      this.currentWaferSource = ''
+      this.deleteMode = false
+      this.$refs.field.focus()
     },
     onClose () {
       this.currentWaferSource = ''

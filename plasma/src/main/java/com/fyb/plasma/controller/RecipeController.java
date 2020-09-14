@@ -66,6 +66,8 @@ public class RecipeController {
         if(!isAuth(session)){
             return CommonResult.forbidden();
         }
+        recipe.setWs(recipe.getWs().toUpperCase());
+        recipe.setRecipeName(recipe.getRecipeName().toUpperCase());
         boolean save = recipeService.save(recipe);
         return save?CommonResult.success(null): CommonResult.failed();
     }
@@ -75,6 +77,7 @@ public class RecipeController {
         if(!isAuth(session)){
             return CommonResult.forbidden();
         }
+        recipe.setRecipeName(recipe.getRecipeName().toUpperCase());
         boolean update = recipeService.updateById(recipe);
         return update?CommonResult.success(null):CommonResult.failed();
     }
