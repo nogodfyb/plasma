@@ -2,7 +2,7 @@ import Vue from 'vue'
 import 'vant/lib/icon/local.css'
 import {
   Button, Form, Field, Cell, CellGroup, Toast,
-  List, Col, Row, Dialog, NavBar
+  List, Col, Row, Dialog, NavBar, Icon
 } from 'vant'
 Vue.use(Button)
 Vue.use(Form)
@@ -16,3 +16,4 @@ Vue.use(Col)
 Vue.use(Row)
 Vue.use(Dialog)
 Vue.use(NavBar)
+Vue.use(Icon)
